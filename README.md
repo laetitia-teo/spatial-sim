@@ -2,6 +2,10 @@
 
 Hi, and welcome to the codebase of the paper SpatialSim, Recognizing Spatial Configurations of objects with Graph Neural Networks. This file will explain how to use the datasets described in the paper, and reproduce the experiments in the main text of the paper.
 
+## Getting the data
+
+After cloning the repository, get the data files from this [link](https://drive.google.com/file/d/1uMonAZTQoHc4e_0bS24kExWw9Fq6_LdO/view?usp=sharing), and extract it in the repo.
+
 ## Replicating experiments
 
 Experiment replication is done in two steps: first, generate the configuration file for the wanted experiment; second, launch the created runfile.
