@@ -4,7 +4,7 @@ Hi, and welcome to the codebase of the paper SpatialSim, Recognizing Spatial Con
 
 ## Replicating experiments
 
-This is done in two steps: first, generate the configuration file for the wanted experiment; second, launch the created runfile.
+Experiment replication is done in two steps: first, generate the configuration file for the wanted experiment; second, launch the created runfile.
 
 ### Identification
 
