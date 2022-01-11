@@ -59,38 +59,34 @@ To access the results of training (test accuracies), please enter the python int
 >>> model_metrics(<index>)
 ```
 
-## Using the provided datasets
+## Using SpatialSim data
 
-### Data format
-
-The data are provided in the `data_json.zip` archive in the Google Drive folder of the experiment. All details about the different datasets are given in the Supplementary Material of the paper.
-
-Each dataset is provided as a JSON dump of a dictionnary. This dictionnary has two entries: `'data'` for the data, and `'labels'` for the labels. The labels entry is a list of length <N_SAMPLES>, with 0 for the negative class and 1 for the positive class. The data entry is: 
-
-- For the Identification task: a list of order 3: for each sample, a configuration is represented as list of all object vectors, the vector of features for each object being itself represented by a list. The `'data'` entry is the list of all configurations.
-
-- For the Discrimination task: a list of order 4: for each sample, a list of length 2 gives the two configurations to compare. Each of those configurations is represented in the same way as for Identification, as a list of lists. The `'data'` entry is the list of all couples of configurations.
-
-### Pytorch Dataloaders
-
-We also provide a subclass of the pytorch `Dataset` and `DataLoader` for our datasets. They are given in the `data_utils.py` module, which is standalone and only requires pytorch to run. The module provides the `SpatialSimDataset` and `SpatialSimDataLoader` classes. Example use:
+We provide utility scripts for handling the data. To create pytorch `Datasets` and `Dataloaders`, use the following commands:
 
 ```python
->>> # Identification
->>> dsname = 'IDS_5'
->>> ds = SpatialSimDataset(os.path.join(DATAPATH, dsname))
->>> dl = SpatialSimDataLoader(ds)
->>>
->>> # Discrimination
->>> dsname = 'CDS_3_8_0'
->>> ds2 = SpatialSimDataset(os.path.join(DATAPATH, dsname))
->>> dl2 = SpatialSimDataLoader(ds2)
+>>> from run_utils import load_ds, load_dl
+>>> data_path = 'data/double/CDS_3_8'  # example dataset
+>>> dataset = load_ds(data_path)
+>>> dataloader = load_dl(data_path)
 ```
 
-The output of `ds[idx]` for Identification is a 2d `torch.Tensor` with the 0-th dimension representing the different objects and the first dimension representing the object features, and a tensor holding the scalar label. For Discrimination it is a 3-tuple of `torch.Tensor`s, one for each configuration, followed by the label.
+### Using image data
 
-The output of one iteration of the dataloader is, for Identification, a 3-tuple. The first element T is a 2d tensor representation of the data for `BATCH_SIZE` samples, concatenated in the batch (0-th) dimension. The second element is the concatenation of the labels for the batch. The third element is a `torch.LongTensor` of indices, of the same length as T that gives, for each element of T (each object in the batch) the index of the scene the object belongs to; it thus contains elements in `[0..BATCH_SIZE - 1]`.
+Image data for the different datasets car be rendered based on the provided data. To do so, please use the following script:
 
-For Discrimination, the data is given in a similar manner. the output of one iteration is a 5-tuple of T1, T2, L, Bi1, Bi2. T1 and T2 are the object tensors for the first and second configurations, where all objects are concatenated alonf the 0-th dimension regardless of the sample they belon to in the batch. L is the tensor of labels, and Bi1/Bi2 are the batch index tensors for the objects in T1 and T2 respectively.
+```bash
+$ python make_imgs.py --task [TASK] --n_proc [N_PROC]
+```
 
-The batch index tensors are necessary because all configurations may not contain the same numbers of objects, which makes it impossible to create a separate dimension for the numbers of objects without using some king of padding.
+`[TASK]` is one of `'simple'` (for Identification) or `'double'` (for Discrimination). `[N_PROC]` is the number of processes to use for image generation, defaults to 4.
+
+After image generation, load the image data as so:
+
+```python
+>>> from run_utils import load_ds, load_dl
+>>> data_path = 'data/double/CDS_3_8'  # data path stays the same
+>>> dataset = load_ds(data_path, use_images=True)
+>>> dataloader = load_dl(data_path, use_images=True)
+```
+
+The datasets and dataloaders will then output images instead of sets of points.
