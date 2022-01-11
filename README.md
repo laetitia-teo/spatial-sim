@@ -30,7 +30,7 @@ After typing the command, a number is printed in the terminal; it corresponds to
 bash launch<index>.sh
 ```
 
-The results are stored in the `experimental_results` folder, under `expe<index>`. Inside the folder, one can find the log file, and a folder for each of the trained models, inside which there is a folder `data` for the train and test accuracies and a folder `models` where the weights for the different seeds of the models, at the end of training, are stored. The format is the one provided by pytorch.
+The results are stored in the `experimental_results` folder, under `expe<index>`. Inside the folder, one can find the log file, and a folder for each of the trained models, inside which there is a folder `data` for the train and test accuracies and a folder `models` where the weights for the different seeds of the models, at the end of training, are stored.
 
 ### Discrimination
 
