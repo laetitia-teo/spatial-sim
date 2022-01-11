@@ -1,5 +1,5 @@
 """
-Small module providing pytorch dataloaders for the different SpatialSIm 
+Small module providing pytorch dataloaders for the different SpatialSim
 datasets.
 """
 

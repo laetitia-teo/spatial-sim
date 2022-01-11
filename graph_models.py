@@ -1618,26 +1618,17 @@ class SiameseResnet18(nn.Module):
 #     DeepSet]
 
 model_list = [
+    DeepSet,
+    DeepSetPlus,
     GCN,
+    GNN_NAgg
 ]
 
-# model_list_double = [
-#     AlternatingDouble,
-#     AlternatingDoublev2,
-#     AlternatingDoubleRDS,
-#     RecurrentGraphEmbedding,
-#     RecurrentGraphEmbeddingv2,
-#     RecurrentGraphEmbeddingRDS,
-#     AlternatingDoubleRDSv2,
-#     RecurrentGraphEmbeddingRDSv2,
-#     AlternatingDoubleDS,
-#     RecurrentGraphEmbeddingDS
-# ]
-
 model_list_double = [
-    AlternatingDoubleGCN,
-    AlternatingDoubleGCNv2,
-    RecurrentGraphEmbeddingGCN,
+    Parallel,
+    ParallelRDS,
+    ParallelGCN,
+    ParallelDS,
 ]
 
 model_list_imgs_simple = [

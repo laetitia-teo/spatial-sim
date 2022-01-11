@@ -156,10 +156,10 @@ def get_default_simple_config(
 
     for n_obj in range(n_min, n_max + 1):
         train_dict[n_obj - n_min] = sorted(
-            [p for p in d_path if re.search(rf'^{n_obj}_.+_.+0$', p)])
+            [p for p in d_path if re.search(rf'^IDS_{n_obj}$', p)])
         
         test_dict[n_obj - n_min] = sorted(
-            [p for p in d_path if re.search(rf'^{n_obj}_.+_test$', p)])
+            [p for p in d_path if re.search(rf'^IDS_{n_obj}_test$', p)])
 
     train = flatten(list(train_dict.values()))
     train_idx = flatten([[k] * len(v) for k, v in train_dict.items()])
@@ -176,11 +176,6 @@ def get_default_simple_config(
         model_list = [gm.GNN_NAgg]
     else:
         model_list = gm.model_list
-        # model_list = [
-        #     gm.DeepSet,
-        #     gm.DeepSetPlus,
-        #     # gm.GNN_NAgg_NGI,
-        #     gm.GNN_NAgg]
 
     hparams = {
         'n_objects': n_max,
@@ -295,9 +290,9 @@ def get_default_double_config(
         n_max = n_min
 
     train_cur = sorted([p for p in d_path if \
-        re.search(rf'^rotcur._{n_min}_{n_max}.+0$', p)])
+        re.search(rf'^CDS_{n_min}_{n_max}_[0-9]+$', p)])
     test = [p for p in d_path if \
-        re.search(rf'^rotcur._{n_min}_{n_max}.+0_test$', p)]
+        re.search(rf'^CDS_{n_min}_{n_max}_test$', p)]
     
     if restricted_models:
         model_list = [
@@ -313,15 +308,7 @@ def get_default_double_config(
             gm.RecurrentGraphEmbeddingGCN,
         ]
     else:
-        # model_list = [
-        #     gm.Parallel,
-        #     # gm.Parallel_NGI,
-        #     gm.ParallelRDS,
-        #     gm.ParallelDS
-        # ]
-        model_list = [
-            gm.ParallelGCN,
-        ]
+        model_list = gm.model_list_double
     hparams = {
         'n_objects': n_max,
         'h': H,
@@ -499,60 +486,23 @@ def get_easy_hard_config():
     config['test_dataset_indices'] = list(range(5))
     return config
 
-def get_var_n_test_double_config(n_test, n_obj=5, cuda=False):
-    config = get_default_double_config(n_obj=n_obj)
-    double_data_path = 'data/comparison'
-    d_path = os.listdir(double_data_path)
-    test = sorted(
-        [p for p in d_path if re.search(r'^testdouble_([0-9]+).*0$', p)],
-        key=lambda p: int(re.search(r'^testdouble_([0-9]+).*0$', p)[1]))
-    config['preload_model'] = True
-    config['load_idx'] = 2
-    config['train_datasets'] = []
-    config['train_dataset_indices'] = []
-    config['test_datasets'] = test
-    config['test_dataset_indices'] = [0] * len(test)
-    return config
+# def get_var_n_test_double_config(n_test, n_obj=5, cuda=False):
+#     config = get_default_double_config(n_obj=n_obj)
+#     double_data_path = 'data/comparison'
+#     d_path = os.listdir(double_data_path)
+#     test = sorted(
+#         [p for p in d_path if re.search(r'^testdouble_([0-9]+).*0$', p)],
+#         key=lambda p: int(re.search(r'^testdouble_([0-9]+).*0$', p)[1]))
+#     config['preload_model'] = True
+#     config['load_idx'] = 2
+#     config['train_datasets'] = []
+#     config['train_dataset_indices'] = []
+#     config['test_datasets'] = test
+#     config['test_dataset_indices'] = [0] * len(test)
+#     return config
 
 ########### rebuttal expes ##########
 
-def get_parallel_double_config(n_obj=5, cuda=False):
-    double_data_path = 'data/comparison'
-    d_path = os.listdir(double_data_path)
-    train_cur = sorted([p for p in d_path if \
-        re.search(r'^rotcur._{}.+0$'.format(n_obj), p)])
-    test = [p for p in d_path if \
-        re.search(r'^rotcur._{}.+0_test$'.format(n_obj), p)][0]
-    model_list = [
-        gm.Parallel,
-        gm.AlternatingDouble,
-        gm.RecurrentGraphEmbedding
-    ]
-    hparams = {
-        'n_objects': n_obj,
-        'h': 16,
-        'N': 2,
-        'lr': 1e-3,
-        'H': 16,
-        'n_layers': 1,
-        'n_epochs': 5
-        }
-    default_double_config = {
-        'setting': 'double',
-        'expe_idx': 1,
-        'train_datasets': train_cur,
-        'train_dataset_indices': [0] * len(train_cur),
-        'test_datasets': test,
-        'test_dataset_indices': [0],
-        'seeds': [0, 1, 2, 3, 4],
-        'hparams': hparams,
-        'hparam_list': [double_hparam_fn(m, **hparams) for m in model_list],
-        'load_dir': 'data/comparison',
-        'save_dir': 'experimental_results',
-        'models': [type_to_string(m) for m in model_list],
-        'cuda': cuda,
-    }
-    return default_double_config
 
 def double_lstm_hparam_fn(*args, **kwargs):
     m = args[0]
@@ -570,51 +520,15 @@ def double_lstm_hparam_fn(*args, **kwargs):
         }
     return (f_dict['f_x'], h, [2 * h] * n_layers)
 
-def get_lstm_double_config(n_obj=5, cuda=False):
-    double_data_path = 'data/comparison'
-    d_path = os.listdir(double_data_path)
-    train_cur = sorted([p for p in d_path if \
-        re.search(r'^rotcur._{}.+0$'.format(n_obj), p)])
-    test = [p for p in d_path if \
-        re.search(r'^rotcur._{}.+0_test$'.format(n_obj), p)][0]
-    model_list = [
-        bm.SceneLSTM
-    ]
-    hparams = {
-        'n_objects': n_obj,
-        'h': 16,
-        'N': 2,
-        'lr': 1e-3,
-        'H': 16,
-        'n_layers': 2,
-        'n_epochs': 5
-        }
-    default_double_config = {
-        'setting': 'double',
-        'expe_idx': 1,
-        'train_datasets': train_cur,
-        'train_dataset_indices': [0] * len(train_cur),
-        'test_datasets': test,
-        'test_dataset_indices': [0],
-        'seeds': [0, 1, 2, 3, 4],
-        'hparams': hparams,
-        'hparam_list': \
-            [double_lstm_hparam_fn(m, **hparams) for m in model_list],
-        'load_dir': 'data/comparison',
-        'save_dir': 'experimental_results',
-        'models': [type_to_string(m) for m in model_list],
-        'cuda': cuda,
-    }
-    return default_double_config
 
 def get_varnobj_double_config(n_obj_min=3, n_obj_max=8, cuda=False):
     double_data_path = 'data/comparison'
     d_path = os.listdir(double_data_path)
     train_cur = sorted([p for p in d_path if \
         re.search(
-            r'^rotcur[0-9]+_{0}_{1}_100000$'.format(
+            r'^CDS[0-9]+_{0}_{1}$'.format(
                 n_obj_min, n_obj_max), p)])
-    test = [f'rotcur4_{n_obj_min}_{n_obj_max}_100000_test']
+    test = [f'CDS_{n_obj_min}_{n_obj_max}_test']
     model_list = [
         gm.AlternatingDouble,
         gm.RecurrentGraphEmbedding
@@ -682,81 +596,6 @@ def get_big_mlp_simple_config(n_obj=5, cuda=False):
     }
     return config
 
-def get_mpgnn_simple_config(n_obj=5, cuda=False):
-    simple_data_path = 'data/recognition'
-    d_path = os.listdir(simple_data_path)
-    train = sorted(
-        [p for p in d_path if re.search(r'^{}_.+_.+0$'.format(n_obj), p)])
-    test = sorted(
-        [p for p in d_path if re.search(r'^{}_.+_test$'.format(n_obj), p)])
-    model_list = [
-        gm.GNN_NAgg
-    ]
-    hparams = {
-        'n_objects': n_obj,
-        'h': 16,
-        'N': 2,
-        'lr': 1e-3,
-        'H': 16,
-        'n_layers': 2,
-        'n_epochs': 20
-        }
-    config = {
-        'setting': 'simple',
-        'expe_idx': 0,
-        'train_datasets': train,
-        'train_dataset_indices': list(range(len(train))),
-        'test_datasets': test,
-        'test_dataset_indices': list(range(len(test))),
-        'seeds': [0, 1, 2, 3, 4],
-        'hparams': hparams,
-        'hparam_list': \
-            [simple_hparam_fn(m, **hparams) for m in model_list],
-        'load_dir': 'data/recognition',
-        'save_dir': 'experimental_results',
-        'models': [type_to_string(m) for m in model_list],
-        'cuda': cuda,
-    }
-    return config
-
-def get_big_mlp_double_config(n_obj=5, cuda=False):
-    double_data_path = 'data/comparison'
-    d_path = os.listdir(double_data_path)
-    train_cur = sorted([p for p in d_path if \
-        re.search(
-            r'^rotcur[0-9]+_{0}_{1}_100000$'.format(
-                n_obj, n_obj), p)])
-    test = [f'rotcur4_{n_obj}_{n_obj}_100000_test']
-    model_list = [
-        bm.DoubleNaiveMLP
-    ]
-    hparams = {
-        'n_objects': n_obj,
-        'h': 2 * n_obj * F_OBJ,
-        'N': 2,
-        'lr': 1e-3,
-        'H': n_obj * F_OBJ,
-        'n_layers': 2,
-        'n_epochs': 20
-        }
-    default_double_config = {
-        'setting': 'double',
-        'expe_idx': 1,
-        'train_datasets': train_cur,
-        'train_dataset_indices': [0] * len(train_cur),
-        'test_datasets': test,
-        'test_dataset_indices': [0],
-        'seeds': [0, 1, 2, 3, 4],
-        'hparams': hparams,
-        'hparam_list': \
-            [double_baseline_hparam_fn(m, **hparams) for m in model_list],
-        'load_dir': 'data/comparison',
-        'save_dir': 'experimental_results',
-        'models': [type_to_string(m) for m in model_list],
-        'cuda': cuda,
-    }
-    return default_double_config
-
 ######### perturb/abstract expes #######
 
 ########################################
@@ -769,7 +608,7 @@ def save_config(config, config_id=-1):
         config_id = max(
             [-1] + [int(search(p)[1]) for p in paths if search(p)]) + 1
     config['expe_idx'] = config_id
-    print(config_id)
+    print(f'Config {config_id} was generated.')
     path = os.path.join(config_folder, 'config%s' % config_id)
     with open(path, 'w') as f:
         f.write(json.dumps(config))
@@ -795,27 +634,16 @@ def export_config(
         config = [get_default_double_config(n_obj=n, **kwargs) for n in n_obj_list]
     elif mode == 'double_parallel':
         config = get_double_parallel_config(**kwargs)
-    elif mode == 'test_double':
-        if n_test is None:
-            raise Exception('Please provide a configuration file index to ' +\
-                'load from using the -l flag.')
-        config = get_var_n_test_double_config(n_test=2, **kwargs)
     elif mode == 'easy_hard':
         config = get_easy_hard_config()
     elif mode == 'baseline_simple':
         config = get_simple_baseline_config(**kwargs)
     elif mode == 'baseline_double':
         config = get_double_baseline_config(**kwargs)
-    elif mode == 'parallel':
-        config = get_parallel_double_config(**kwargs)
-    elif mode == 'lstm':
-        config = get_lstm_double_config(**kwargs)
     elif mode == 'var':
         config = get_varnobj_double_config(**kwargs)
     elif mode == 'bigmlp_s':
         config = get_big_mlp_simple_config(**kwargs)
-    elif mode == 'mpgnn_s':
-        config = get_mpgnn_simple_config(**kwargs)
     elif mode == 'bigmlp_d':
         config = get_big_mlp_double_config(**kwargs)
     # perturb/abstract
