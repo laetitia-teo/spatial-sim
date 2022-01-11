@@ -4,3 +4,4 @@ opencv-python
 pygame
 torch
 tqdm
+torch_geometric
