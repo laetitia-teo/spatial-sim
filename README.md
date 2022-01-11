@@ -1,6 +1,6 @@
 # SpatialSim Howto
 
-Hi, and welcome to the codebase of the paper SpatialSim, Recognizing Spatial Configurations of objects with Graph Neural Networks. This file will explain how to use the datasets described in the paper, and reproduce the experiments in the main text of the paper.
+Hi, and welcome to the codebase of the paper SpatialSim, Recognizing Spatial Configurations of objects with Graph Neural Networks. This file will explain how to use the datasets described in the paper, and reproduce the experiments in the main text.
 
 ## Getting the data
 
