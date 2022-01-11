@@ -1,10 +1,14 @@
-# SpatialSim howto
+# SpatialSim Howto
 
-This file provides information on replicating he experiments of the accompanying paper, and instructions on how to use the provided datasets.
+Hi, and welcome to the codebase of the paper SpatialSim, Recognizing Spatial Configurations of objects with Graph Neural Networks. This file will explain how to use the datasets described in the paper, and reproduce the experiments in the main text.
+
+## Getting the data
+
+After cloning the repository, get the data files from this [link](https://drive.google.com/file/d/1uMonAZTQoHc4e_0bS24kExWw9Fq6_LdO/view?usp=sharing), and extract it in the repo.
 
 ## Replicating experiments
 
-This is done in two steps: first, generate the configuration file for the wanted experiment; second, launch the created runfile.
+Experiment replication is done in two steps: first, generate the configuration file for the wanted experiment; second, launch the created runfile.
 
 ### Identification
 
@@ -26,7 +30,7 @@ After typing the command, a number is printed in the terminal; it corresponds to
 bash launch<index>.sh
 ```
 
-The results are stored in the `experimental_results` folder, under `expe<index>`. Inside the folder, one can find the log file, and a folder for each of the trained models, inside which there is a folder `data` for the train and test accuracies and a folder `models` where the weights for the different seeds of the models, at the end of training, are stored. The format is the one provided by pytorch.
+The results are stored in the `experimental_results` folder, under `expe<index>`. Inside the folder, one can find the log file, and a folder for each of the trained models, inside which there is a folder `data` for the train and test accuracies and a folder `models` where the weights for the different seeds of the models, at the end of training, are stored.
 
 ### Discrimination
 
