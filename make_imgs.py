@@ -14,7 +14,7 @@ parser = ArgumentParser()
 add = parser.add_argument
 add('--path', default='data', type=str)
 add('--task', default='double', choices=['simple', 'double'])
-add('--n_proc', type=int, default=8)
+add('--n_proc', type=int, default=4)
 args = parser.parse_args()
 
 def make_imgs(data_files):
@@ -33,12 +33,13 @@ def make_imgs(data_files):
 task = args.task
 path = os.path.join(args.path, task)
 data_files = os.listdir(path)
+pathlib.Path(os.path.join(path, 'images')).mkdir(exist_ok=True)
 already_processed = os.listdir(os.path.join(args.path, task, 'images'))
 data_files = [f for f in data_files if f not in already_processed]
 if task == 'double':
-    data_files = [f for f in data_files if re.match(r'^rotcur.*$', f) is not None]
+    data_files = [f for f in data_files if re.match(r'^CDS_[0-9]+_[0-9]+.*$', f) is not None]
 else:
-    data_files = [f for f in data_files if re.match(r'^[0-9]+_[0-9]+_[0-9]+$', f) is not None]
+    data_files = [f for f in data_files if re.match(r'^IDS_[0-9]+.*$', f) is not None]
 data_files = [p for p in data_files if not pathlib.Path(os.path.join(path, p)).is_dir()]
 print(f'Rendering for task {task}, found {len(data_files)} files')
 pprint(data_files)

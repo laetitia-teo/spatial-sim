@@ -105,32 +105,50 @@ def data_to_clss_parts(data, use_images=False, setting='simple'):
         return data[2]
     return data[2]
 
-def load_dl(dpath, double=False, cut=None, multiply=None,
-            use_images=False, device=torch.device('cpu')):
-    if not double:
-        g = SameConfigGen()
-    if double:
-        g = CompareConfigGen()
-    g.load(dpath)
-
-    if cut is not None:
-        g.cut(cut)
-    if multiply is not None:
-        g.multiply(multiply)
-
-    if not use_images:
-        dl = DataLoader(
-                g.to_dataset(device=device),
-                shuffle=True,
-                batch_size=B_SIZE,
-                collate_fn=collate_fn)
+def load_ds(dpath, use_images=False):
+    if 'CDS' in dpath:
+        generator = CompareConfigGen()
     else:
-        dl = DataLoader(
-            g.to_dataset(use_images=use_images, device=device),
-            shuffle=True,
-            batch_size=B_SIZE,
-        )
-    return dl
+        generator = SameConfigGen()
+    print(f'Loading data at {dpath}.')
+    generator.load(dpath)
+    print('Finished loading.')
+    return generator.to_dataset(use_images=use_images)
+
+def load_dl(dpath, use_images=False):
+    ds = load_ds(dpath, use_images=use_images)
+    if use_images:
+        return DataLoader(ds, shuffle=True, batch_size=B_SIZE)
+    else:
+        return DataLoader(ds, shuffle=True, batch_size=B_SIZE,
+                          collate_fn=collate_fn)
+
+# def load_dl(dpath, double=False, cut=None, multiply=None,
+#             use_images=False, device=torch.device('cpu')):
+#     if not double:
+#         g = SameConfigGen()
+#     if double:
+#         g = CompareConfigGen()
+#     g.load(dpath)
+#
+#     if cut is not None:
+#         g.cut(cut)
+#     if multiply is not None:
+#         g.multiply(multiply)
+#
+#     if not use_images:
+#         dl = DataLoader(
+#                 g.to_dataset(device=device),
+#                 shuffle=True,
+#                 batch_size=B_SIZE,
+#                 collate_fn=collate_fn)
+#     else:
+#         dl = DataLoader(
+#             g.to_dataset(use_images=use_images, device=device),
+#             shuffle=True,
+#             batch_size=B_SIZE,
+#         )
+#     return dl
 
 
 # model saving and loading
